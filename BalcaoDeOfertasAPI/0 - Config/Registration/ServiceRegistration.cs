@@ -1,7 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using DtosBalcaoDeOfertas.InputDTO;
+using Microsoft.EntityFrameworkCore;
 using BalcaoDeOfertasAPI._3___Services;
 using BalcaoDeOfertasAPI._4___Repository;
 using BalcaoDeOfertasAPI._0___Config.Profiles;
+using BalcaoDeOfertasAPI._0___Config.Validator;
 using BalcaoDeOfertasAPI._4___Repository.Context;
 using BalcaoDeOfertasAPI._3___Services.Interfaces;
 using BalcaoDeOfertasAPI._4___Repository.Interfaces;
@@ -23,6 +26,7 @@ namespace BalcaoDeOfertasAPI._0___Config.Registration
             ConfigureAutoMapper(services);
             ConfigureServicesLayer(services);
             ConfigureRepositoriesLayer(services);
+            ConfigureValidatorLayer(services);
 
             services.AddControllers();
             services.AddEndpointsApiExplorer();
@@ -56,6 +60,13 @@ namespace BalcaoDeOfertasAPI._0___Config.Registration
         {
             // Registrar repositorios
             services.AddScoped<IOfertasRepository, OfertasRepository>();
+        }
+
+        private void ConfigureValidatorLayer(IServiceCollection services)
+        {
+            // Registrar validadores
+            services.AddTransient<IValidator<NovaOfertaInputDTO>, NovaOfertaInputValidator>();
+            services.AddTransient<IValidator<ExcluirOfertaInputDTO>, ExcluirOfertaInputValidator>();
         }
     }
 }

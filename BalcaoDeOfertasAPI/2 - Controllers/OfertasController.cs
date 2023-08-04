@@ -18,20 +18,20 @@ namespace BalcaoDeOfertasAPI._2___Controllers
 
         [HttpPost]
         [Route("CriarOferta")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CriarOferta([FromBody] OfertaInputDTO inputDto)
+        [ProducesResponseType(typeof(OfertaOutputDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> CriarOferta([FromBody] NovaOfertaInputDTO inputDto)
         {
             try
             {
                 var result = await _ofertasService.CriarOferta(inputDto);
 
-                if (result.CodigoErro is (short)CodigoDeErros.Codigo.Duplicado)
-                    return Conflict(result.Erro);
+                if (result.CodigoErro is (short)CodigoDeErros.Codigo.SaldoInsuficiente)
+                    return Forbid(result.MensagemDeRetorno);
 
                 if (result.CodigoErro is (short)CodigoDeErros.Codigo.LimiteDeOfertas)
-                    return BadRequest(result.Erro);
+                    return BadRequest(result.MensagemDeRetorno);
 
                 return Created($"Oferta/{result.Id}", result);
             }
@@ -43,20 +43,23 @@ namespace BalcaoDeOfertasAPI._2___Controllers
 
         [HttpPost]
         [Route("ExcluirOferta")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ExcluirOferta([FromBody] OfertaInputDTO inputDto)
+        [ProducesResponseType(typeof(OfertaOutputDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ExcluirOferta([FromBody] ExcluirOfertaInputDTO inputDto)
         {
             try
             {
                 var result = await _ofertasService.ExcluirOferta(inputDto);
 
                 if (result.CodigoErro is (short)CodigoDeErros.Codigo.NaoLocalizado)
-                    return NotFound(result.Erro);
+                    return NotFound(result.MensagemDeRetorno);
 
                 if (result.CodigoErro is (short)CodigoDeErros.Codigo.UsuarioIncorreto)
-                    return BadRequest(result.Erro);
+                    return BadRequest(result.MensagemDeRetorno);
+
+                if (result.CodigoErro is (short)CodigoDeErros.Codigo.Excluido)
+                    return Ok(result.MensagemDeRetorno);
 
                 return Ok(result);
             }

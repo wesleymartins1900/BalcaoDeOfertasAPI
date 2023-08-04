@@ -4,10 +4,11 @@
     {
         public long Id { get; set; }
         public double PrecoUnitario { get; set; }
-        public double Quantidade { get; set; }
-        public string Motivo { get; set; }
+        public int Quantidade { get; set; }
         public DateTime DataEHoraInclusao { get; set; }
-        public Guid UsuarioId { get; set; }
         public bool Excluido { get; set; }
+
+        public Guid UsuarioId { get; set; }
+        public Guid MoedaId { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BalcaoDeOfertasAPI._1___Models;
+﻿using DtosBalcaoDeOfertas.InputDTO;
+using BalcaoDeOfertasAPI._1___Models;
 
 namespace BalcaoDeOfertasAPI._4___Repository.Interfaces
 {
@@ -8,12 +9,14 @@ namespace BalcaoDeOfertasAPI._4___Repository.Interfaces
 
         Task<IList<Oferta>> GetBalcaoDeOfertasByScroll(int scrollId, int pageSize);
 
-        Task CriarOferta(Oferta oferta);
+        Task<long> CriarOferta(Oferta oferta);
 
         Task<Oferta?> LocalizarOfertaById(long id);
 
         Task AtualizarOferta(Oferta oferta);
 
         Task<int> QuantidadeOfertasPorDiaPorUsuario(Guid usuarioId);
+
+        Task<bool> ExisteSaldoParaCriacaoDaOferta(NovaOfertaInputDTO inputDto);
     }
 }

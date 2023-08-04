@@ -7,8 +7,8 @@ namespace BalcaoDeOfertasAPI._3___Services.Interfaces
     {
         Task<IList<Oferta>> GetBalcaoDeOfertas(int page, int pageSize, string? scrollId);
 
-        Task<OfertaInputDTO> CriarOferta(OfertaInputDTO inputDto);
+        Task<OfertaOutputDTO> CriarOferta(NovaOfertaInputDTO inputDto);
 
-        Task<OfertaInputDTO> ExcluirOferta(OfertaInputDTO inputDto);
+        Task<OfertaOutputDTO> ExcluirOferta(ExcluirOfertaInputDTO inputDto);
     }
 }

@@ -3,7 +3,5 @@
     public class Usuario
     {
         public Guid Id { get; set; }
-        public string Nome { get; set; }
-        public double Saldo { get; set; }
     }
 }

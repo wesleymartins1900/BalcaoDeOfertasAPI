@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using BalcaoDeOfertasAPI._1___Models;
 using BalcaoDeOfertasAPI._3___Services.Interfaces;
 
 namespace BalcaoDeOfertasAPI.Controllers
@@ -15,8 +16,8 @@ namespace BalcaoDeOfertasAPI.Controllers
         }
 
         [HttpGet(Name = "GetBalcaoDeOfertas")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(IList<Oferta>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetBalcaoDeOfertas(int page = 1, int pageSize = 10, string? scrollId = null)
         {
@@ -24,7 +25,8 @@ namespace BalcaoDeOfertasAPI.Controllers
             {
                 var result = await _balcaoDeOfertasService.GetBalcaoDeOfertas(page, pageSize, scrollId);
 
-                if (!result.Any()) return NotFound();
+                if (!result.Any())
+                    return NotFound();
 
                 return Ok(result);
             }

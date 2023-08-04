@@ -8,7 +8,8 @@ namespace BalcaoDeOfertasAPI._0___Config.Profiles
     {
         public ModelsProfile()
         {
-            CreateMap<OfertaInputDTO, Oferta>();
+            CreateMap<NovaOfertaInputDTO, Oferta>();
+            CreateMap<Oferta, OfertaOutputDTO>();
         }
     }
 }
