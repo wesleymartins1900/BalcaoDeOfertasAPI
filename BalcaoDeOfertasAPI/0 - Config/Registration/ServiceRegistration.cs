@@ -54,12 +54,14 @@ namespace BalcaoDeOfertasAPI._0___Config.Registration
         {
             // Registrar servicos
             services.AddScoped<IOfertasService, OfertasService>();
+            services.AddScoped<IMoedasService, MoedasService>();
         }
 
         private void ConfigureRepositoriesLayer(IServiceCollection services)
         {
             // Registrar repositorios
             services.AddScoped<IOfertasRepository, OfertasRepository>();
+            services.AddScoped<IMoedasRepository, MoedasRepository>();
         }
 
         private void ConfigureValidatorLayer(IServiceCollection services)

@@ -5,10 +5,10 @@ namespace BalcaoDeOfertasAPI._3___Services.Interfaces
 {
     public interface IOfertasService
     {
-        Task<IList<Oferta>> GetBalcaoDeOfertas(int page, int pageSize, string? scrollId);
+        Task<IList<Oferta>> GetBalcaoDeOfertasAsync(int page, int pageSize, string? scrollId);
 
-        Task<OfertaOutputDTO> CriarOferta(NovaOfertaInputDTO inputDto);
+        Task<OfertaOutputDTO> CriarOfertaAsync(NovaOfertaInputDTO inputDto);
 
-        Task<OfertaOutputDTO> ExcluirOferta(ExcluirOfertaInputDTO inputDto);
+        Task<OfertaOutputDTO> ExcluirOfertaAsync(ExcluirOfertaInputDTO inputDto);
     }
 }

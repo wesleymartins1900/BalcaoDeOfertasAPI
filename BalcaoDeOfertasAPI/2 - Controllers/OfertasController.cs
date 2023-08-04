@@ -21,11 +21,11 @@ namespace BalcaoDeOfertasAPI._2___Controllers
         [ProducesResponseType(typeof(OfertaOutputDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> CriarOferta([FromBody] NovaOfertaInputDTO inputDto)
+        public async Task<IActionResult> CriarOfertaAsync([FromBody] NovaOfertaInputDTO inputDto)
         {
             try
             {
-                var result = await _ofertasService.CriarOferta(inputDto);
+                var result = await _ofertasService.CriarOfertaAsync(inputDto);
 
                 if (result.CodigoErro is (short)CodigoDeErros.Codigo.SaldoInsuficiente)
                     return Forbid(result.MensagemDeRetorno);
@@ -33,7 +33,7 @@ namespace BalcaoDeOfertasAPI._2___Controllers
                 if (result.CodigoErro is (short)CodigoDeErros.Codigo.LimiteDeOfertas)
                     return BadRequest(result.MensagemDeRetorno);
 
-                return Created($"Oferta/{result.Id}", result);
+                return Created($"Ofertas/{result.Id}", result);
             }
             catch (Exception ex)
             {
@@ -46,11 +46,11 @@ namespace BalcaoDeOfertasAPI._2___Controllers
         [ProducesResponseType(typeof(OfertaOutputDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ExcluirOferta([FromBody] ExcluirOfertaInputDTO inputDto)
+        public async Task<IActionResult> ExcluirOfertaAsync([FromBody] ExcluirOfertaInputDTO inputDto)
         {
             try
             {
-                var result = await _ofertasService.ExcluirOferta(inputDto);
+                var result = await _ofertasService.ExcluirOfertaAsync(inputDto);
 
                 if (result.CodigoErro is (short)CodigoDeErros.Codigo.NaoLocalizado)
                     return NotFound(result.MensagemDeRetorno);

@@ -4,6 +4,8 @@
     {
         public Guid Id { get; set; }
         public string Nome { get; set; }
+
         public Guid UsuarioId { get; set; }
+        public Usuario Usuario { get; set; }
     }
 }

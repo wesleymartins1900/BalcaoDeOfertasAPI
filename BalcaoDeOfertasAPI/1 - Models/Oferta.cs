@@ -9,6 +9,9 @@
         public bool Excluido { get; set; }
 
         public Guid UsuarioId { get; set; }
+        public Usuario Usuario { get; set; }
+
         public Guid MoedaId { get; set; }
+        public Moeda Moeda { get; set; }
     }
 }

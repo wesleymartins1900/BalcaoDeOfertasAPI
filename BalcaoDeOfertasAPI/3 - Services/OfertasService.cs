@@ -10,24 +10,26 @@ namespace BalcaoDeOfertasAPI._3___Services
 {
     public class OfertasService : IOfertasService
     {
-        private readonly IOfertasRepository _balcaoDeOfertasRepository;
+        private readonly IMoedasService _moedasService;
+        private readonly IOfertasRepository _ofertasRepository;
         private readonly IMapper _mapper;
         private readonly IValidator<NovaOfertaInputDTO> _novaOfertaValidator;
         private readonly IValidator<ExcluirOfertaInputDTO> _excluirOfertaValidator;
 
         private const int LimiteDeOfertasPorDiaPorUsuario = 5;
 
-        public OfertasService(IOfertasRepository balcaoDeOfertasRepository, IMapper mapper, IValidator<NovaOfertaInputDTO> novaOfertaValidator, IValidator<ExcluirOfertaInputDTO> excluirOfertaValidator)
+        public OfertasService(IOfertasRepository ofertasRepository, IMapper mapper, IValidator<NovaOfertaInputDTO> novaOfertaValidator, IValidator<ExcluirOfertaInputDTO> excluirOfertaValidator, IMoedasService moedasService)
         {
-            _balcaoDeOfertasRepository = balcaoDeOfertasRepository;
+            _ofertasRepository = ofertasRepository;
             _mapper = mapper;
             _novaOfertaValidator = novaOfertaValidator;
             _excluirOfertaValidator = excluirOfertaValidator;
+            _moedasService = moedasService;
         }
 
-        private async Task<bool> UsuarioAtingiuLimiteDeOfertas(Guid usuarioId)
+        private async Task<bool> UsuarioAtingiuLimiteDeOfertasAsync(Guid usuarioId)
         {
-            var result = await _balcaoDeOfertasRepository.QuantidadeOfertasPorDiaPorUsuario(usuarioId);
+            var result = await _ofertasRepository.QuantidadeOfertasPorDiaPorUsuarioAsync(usuarioId);
 
             if (result >= LimiteDeOfertasPorDiaPorUsuario)
                 return true;
@@ -35,9 +37,14 @@ namespace BalcaoDeOfertasAPI._3___Services
             return false;
         }
 
-        private async Task<bool> ExisteSaldoParaCriacaoDaOferta(NovaOfertaInputDTO inputDto) => await _balcaoDeOfertasRepository.ExisteSaldoParaCriacaoDaOferta(inputDto);
+        private async Task<bool> ExisteSaldoParaCriacaoDaOfertaAsync(int quantidadeDaNovaOferta, int quantidadeTotalDisponivel, Guid moedaId)
+        {
+            var QuantidadeEmOfertas = await _ofertasRepository.SomaDaQuantidadeTotalDaMoedaEmOfertasAsync(moedaId);
 
-        public async Task<OfertaOutputDTO> CriarOferta(NovaOfertaInputDTO inputDto)
+            return quantidadeDaNovaOferta + QuantidadeEmOfertas <= quantidadeTotalDisponivel;
+        }
+
+        public async Task<OfertaOutputDTO> CriarOfertaAsync(NovaOfertaInputDTO inputDto)
         {
             var validationResult = await _novaOfertaValidator.ValidateAsync(inputDto);
 
@@ -53,18 +60,19 @@ namespace BalcaoDeOfertasAPI._3___Services
                 return outputDto;
             }
 
-            if (await UsuarioAtingiuLimiteDeOfertas(inputDto.UsuarioId))
+            var dadosDaCarteira = await _moedasService.CarregarDadosDaCarteiraDoUsuarioAsync(inputDto.MoedaId, inputDto.UsuarioId);
+            if (dadosDaCarteira is null)
             {
                 var outputDto = new OfertaOutputDTO()
                 {
-                    MensagemDeRetorno = "O usuário atingiu o limite de ofertas permitidas por dia.",
-                    CodigoErro = (short)CodigoDeErros.Codigo.LimiteDeOfertas,
+                    MensagemDeRetorno = $"Não foi localizado a carteira virtual do usuário {inputDto.UsuarioId}.",
+                    CodigoErro = (short)CodigoDeErros.Codigo.DadosFaltantesOuInvalidos,
                 };
 
                 return outputDto;
             }
 
-            if (await ExisteSaldoParaCriacaoDaOferta(inputDto))
+            if (await ExisteSaldoParaCriacaoDaOfertaAsync(inputDto.Quantidade, dadosDaCarteira.QuantidadeTotal, inputDto.MoedaId))
             {
                 var outputDto = new OfertaOutputDTO()
                 {
@@ -75,8 +83,19 @@ namespace BalcaoDeOfertasAPI._3___Services
                 return outputDto;
             }
 
+            if (await UsuarioAtingiuLimiteDeOfertasAsync(inputDto.UsuarioId))
+            {
+                var outputDto = new OfertaOutputDTO()
+                {
+                    MensagemDeRetorno = "O usuário atingiu o limite de ofertas permitidas por dia.",
+                    CodigoErro = (short)CodigoDeErros.Codigo.LimiteDeOfertas,
+                };
+
+                return outputDto;
+            }
+
             var oferta = _mapper.Map<Oferta>(inputDto);
-            var idOfertaCriada = await _balcaoDeOfertasRepository.CriarOferta(oferta);
+            var idOfertaCriada = await _ofertasRepository.CriarOfertaAsync(oferta);
 
             oferta.Id = idOfertaCriada;
 
@@ -86,7 +105,7 @@ namespace BalcaoDeOfertasAPI._3___Services
             return output;
         }
 
-        public async Task<OfertaOutputDTO> ExcluirOferta(ExcluirOfertaInputDTO inputDto)
+        public async Task<OfertaOutputDTO> ExcluirOfertaAsync(ExcluirOfertaInputDTO inputDto)
         {
             var validationResult = await _excluirOfertaValidator.ValidateAsync(inputDto);
 
@@ -102,7 +121,7 @@ namespace BalcaoDeOfertasAPI._3___Services
                 return outputDto;
             }
 
-            var oferta = await _balcaoDeOfertasRepository.LocalizarOfertaById(inputDto.Id);
+            var oferta = await _ofertasRepository.LocalizarOfertaByIdAsync(inputDto.Id);
 
             if (oferta is null)
             {
@@ -138,7 +157,7 @@ namespace BalcaoDeOfertasAPI._3___Services
             }
 
             oferta.Excluido = true;
-            await _balcaoDeOfertasRepository.AtualizarOferta(oferta);
+            await _ofertasRepository.AtualizarOfertaAsync(oferta);
 
             var output = _mapper.Map<OfertaOutputDTO>(oferta);
             output.MensagemDeRetorno = "Excluído com sucesso!";
@@ -146,12 +165,12 @@ namespace BalcaoDeOfertasAPI._3___Services
             return output;
         }
 
-        public async Task<IList<Oferta>> GetBalcaoDeOfertas(int page, int pageSize, string? scrollIdString)
+        public async Task<IList<Oferta>> GetBalcaoDeOfertasAsync(int page, int pageSize, string? scrollIdString)
         {
             if (int.TryParse(scrollIdString, out var scrollId))
-                return await _balcaoDeOfertasRepository.GetBalcaoDeOfertasByScroll(scrollId, pageSize);
+                return await _ofertasRepository.GetBalcaoDeOfertasByScrollAsync(scrollId, pageSize);
 
-            return await _balcaoDeOfertasRepository.GetBalcaoDeOfertasByPage(page, pageSize);
+            return await _ofertasRepository.GetBalcaoDeOfertasByPageAsync(page, pageSize);
         }
     }
 }
