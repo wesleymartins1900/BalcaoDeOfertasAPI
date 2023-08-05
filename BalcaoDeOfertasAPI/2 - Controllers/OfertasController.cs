@@ -20,15 +20,16 @@ namespace BalcaoDeOfertasAPI._2___Controllers
         [Route("CriarOferta")]
         [ProducesResponseType(typeof(OfertaOutputDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CriarOfertaAsync([FromBody] NovaOfertaInputDTO inputDto)
         {
             try
             {
                 var result = await _ofertasService.CriarOfertaAsync(inputDto);
 
+                // Estes retornos de falha, mantive desta forma para ficar organizado caso tenha necessidade de retornar algum 'Status Code' específico.
                 if (result.CodigoErro is (short)CodigoDeErros.Codigo.SaldoInsuficiente)
-                    return Forbid(result.MensagemDeRetorno);
+                    return BadRequest(result.MensagemDeRetorno);
 
                 if (result.CodigoErro is (short)CodigoDeErros.Codigo.LimiteDeOfertas)
                     return BadRequest(result.MensagemDeRetorno);

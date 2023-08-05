@@ -8,9 +8,9 @@ namespace BalcaoDeOfertasAPI._4___Repository.Context
         public DbApiContext(DbContextOptions<DbApiContext> options) : base(options)
         { }
 
-        public virtual DbSet<Usuario> Usuarios { get; set; }
-        public virtual DbSet<Oferta> Ofertas { get; set; }
-        public virtual DbSet<Moeda> Moedas { get; set; }
+        public virtual DbSet<Usuario> Usuario { get; set; }
+        public virtual DbSet<Oferta> Oferta { get; set; }
+        public virtual DbSet<Moeda> Moeda { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

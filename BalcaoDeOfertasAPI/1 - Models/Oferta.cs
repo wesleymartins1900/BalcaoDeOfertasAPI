@@ -3,9 +3,10 @@
     public class Oferta
     {
         public long Id { get; set; }
-        public double PrecoUnitario { get; set; }
+        public decimal PrecoUnitario { get; set; }
         public int Quantidade { get; set; }
         public DateTime DataEHoraInclusao { get; set; }
+        public DateTime DataEHoraExclusao { get; set; }
         public bool Excluido { get; set; }
 
         public Guid UsuarioId { get; set; }

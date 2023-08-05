@@ -72,7 +72,7 @@ namespace BalcaoDeOfertasAPI._3___Services
                 return outputDto;
             }
 
-            if (await ExisteSaldoParaCriacaoDaOfertaAsync(inputDto.Quantidade, dadosDaCarteira.QuantidadeTotal, inputDto.MoedaId))
+            if (!await ExisteSaldoParaCriacaoDaOfertaAsync(inputDto.Quantidade, dadosDaCarteira.QuantidadeTotal, inputDto.MoedaId))
             {
                 var outputDto = new OfertaOutputDTO()
                 {
@@ -95,8 +95,9 @@ namespace BalcaoDeOfertasAPI._3___Services
             }
 
             var oferta = _mapper.Map<Oferta>(inputDto);
-            var idOfertaCriada = await _ofertasRepository.CriarOfertaAsync(oferta);
+            oferta.DataEHoraInclusao = DateTime.Now;
 
+            var idOfertaCriada = await _ofertasRepository.CriarOfertaAsync(oferta);
             oferta.Id = idOfertaCriada;
 
             var output = _mapper.Map<OfertaOutputDTO>(oferta);
@@ -108,7 +109,6 @@ namespace BalcaoDeOfertasAPI._3___Services
         public async Task<OfertaOutputDTO> ExcluirOfertaAsync(ExcluirOfertaInputDTO inputDto)
         {
             var validationResult = await _excluirOfertaValidator.ValidateAsync(inputDto);
-
             if (!validationResult.IsValid)
             {
                 var outputDto = new OfertaOutputDTO()
@@ -157,6 +157,7 @@ namespace BalcaoDeOfertasAPI._3___Services
             }
 
             oferta.Excluido = true;
+            oferta.DataEHoraExclusao = DateTime.Now;
             await _ofertasRepository.AtualizarOfertaAsync(oferta);
 
             var output = _mapper.Map<OfertaOutputDTO>(oferta);

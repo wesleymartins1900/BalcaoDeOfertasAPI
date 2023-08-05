@@ -23,7 +23,7 @@ namespace BalcaoDeOfertasAPI.Controllers
         {
             try
             {
-                var result = await _balcaoDeOfertasService.GetBalcaoDeOfertas(page, pageSize, scrollId);
+                var result = await _balcaoDeOfertasService.GetBalcaoDeOfertasAsync(page, pageSize, scrollId);
 
                 if (!result.Any())
                     return NotFound();

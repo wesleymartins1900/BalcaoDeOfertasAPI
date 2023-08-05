@@ -14,7 +14,7 @@ namespace BalcaoDeOfertasAPI._4___Repository
             _context = context;
         }
 
-        public async Task<Moeda?> CarregaDadosDaCarteiraDoUsuarioAsync(Guid moedaId, Guid usuarioId) => await _context.Moedas
+        public async Task<Moeda?> CarregaDadosDaCarteiraDoUsuarioAsync(Guid moedaId, Guid usuarioId) => await _context.Moeda
                                                                                                                       .Include(c => c.Carteira)
                                                                                                                       .Where(x => x.Id == moedaId
                                                                                                                                && x.Carteira.UsuarioId == usuarioId)

@@ -32,8 +32,11 @@ INSERT INTO Moeda (Id, Nome, QuantidadeTotal, ValorReal, CarteiraId)  VALUES
 -- SELECT * FROM Moeda
 
 SELECT  u.Nome AS Usuario,
+		u.Id AS UsuarioId,
 		c.Nome AS Carteira,
-		m.Nome AS Moeda
+		m.Nome AS Moeda,
+		m.Id AS MoedaId,
+		m.QuantidadeTotal AS QuantidadeDaMoedaDisponivel
 FROM	Moeda	 m 	
 JOIN	Carteira c ON (m.CarteiraId = c.Id)
 JOIN	Usuario  u ON (c.UsuarioId = u.Id)
